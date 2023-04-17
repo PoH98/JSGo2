@@ -11,7 +11,7 @@
                 </v-row>
             </v-container>
         </v-app-bar>
-        <v-img class="bg-img" cover src="/bg-img.jpg">
+        <v-img class="bg-img" cover src="/bg-login.jpg">
             <v-main>
                 <v-container>
                     <div class="hud">

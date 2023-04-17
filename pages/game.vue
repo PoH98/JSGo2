@@ -11,7 +11,7 @@
                 </v-row>
             </v-container>
         </v-app-bar>
-        <v-img class="bg-img" cover src="/bg-img.jpg">
+        <v-img class="bg-img" cover src="/bg-game.jpg">
             <v-main>
                 <v-container>
                     <v-tabs v-model:model-value="selectedIndex">
@@ -39,7 +39,7 @@
                                         <span></span>
                                         <span></span>
                                         <span></span>
-                                        <v-form class="content" @submit.prevent="createPlanet">
+                                        <v-form class="content" v-model="valid" @submit.prevent="createPlanet">
                                             <v-text-field v-model="form.username" label="Planet Name" :rules="required">
 
                                             </v-text-field>
@@ -57,6 +57,20 @@
                         </v-window-item>
                     </v-window>
                 </v-container>
+                <v-dialog v-model="error">
+                    <v-card max-width="400" class="mx-auto">
+                        <v-card-title>
+                            Mission failed successfully!
+                        </v-card-title>
+                        <v-card-text>
+                            Commander what had you done?! Error code:
+                            {{ errorMessage }}
+                        </v-card-text>
+                        <v-btn class="d-block mt-3 w-100" color="red" @click="error = false">
+                            OK
+                        </v-btn>
+                    </v-card>
+                </v-dialog>
             </v-main>
         </v-img>
     </v-app>
@@ -120,39 +134,58 @@ export default {
                 username: "",
                 ground: null
             },
+            valid: null,
+            error: false,
+            errorMessage: null,
             required: [(v) => v !== undefined && v !== null && v != '' || 'Required field']
         }
     },
     methods: {
         async createPlanet() {
-            const res = await $fetch(this.appConfig.apiUrl + '/api/account/create/user', {
-                method: 'POST',
-                headers: {
-                    Authorization: this.store.sessionKey
-                },
-                body: this.form
-            });
-            if (res.code === 200) {
-                this.form.username = "";
-                this.form.ground = null;
-                const res = await $fetch(this.appConfig.apiUrl + '/api/account/list/user', {
-                    method: 'GET',
+            if(!this.valid)
+            {
+                return;
+            }
+            try {
+                const res = await $fetch(this.appConfig.apiUrl + '/api/account/create/user', {
+                    method: 'POST',
                     headers: {
                         Authorization: this.store.sessionKey
-                    }
+                    },
+                    body: this.form
                 });
+                if (res.message) {
+                    this.error = true;
+                    this.errorMessage = res.message;
+                    return;
+                }
                 if (res.code === 200) {
-                    this.planets = res.data;
+                    this.form.username = "";
+                    this.form.ground = null;
+                    const res = await $fetch(this.appConfig.apiUrl + '/api/account/list/user', {
+                        method: 'GET',
+                        headers: {
+                            Authorization: this.store.sessionKey
+                        }
+                    });
+                    if (res.code === 200) {
+                        this.planets = res.data;
+                    }
+                    else if (res.code === 401) {
+                        this.store.logout();
+                        this.$router.push("/");
+                    }
                 }
                 else if (res.code === 401) {
                     this.store.logout();
                     this.$router.push("/");
                 }
             }
-            else if (res.code === 401) {
-                this.store.logout();
-                this.$router.push("/");
+            catch (ex) {
+                this.error = true;
+                this.errorMessage = ex.name;
             }
+
         }
     }
 }

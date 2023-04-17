@@ -1,13 +1,23 @@
 <template>
-    <div :id="'play_' + id" class="play-canvas">
-
+    <div :id="'play_' + id" class="play-canvas position-relative">
+        <BarHUD/>
+        <div class="loader">
+            <div class="outer">
+                <div class="inner"></div>
+            </div>
+            <p class="text-center loader-title">{{ status }}</p>
+        </div>
     </div>
 </template>
 <script>
+import BarHUD from './BarHUD.vue';
 import moment from 'moment';
 import { useGameStore } from '@/store/gameStore';
 import { Game } from '@/game/game.client';
 export default {
+    components:{
+        BarHUD
+    },
     props: {
         planetData: {
             required: true,
@@ -26,7 +36,8 @@ export default {
         return {
             keyToken: {},
             game: null,
-            id: ""
+            id: "",
+            status: "Connecting to Planet Network"
         }
     },
     async mounted() {
@@ -40,12 +51,13 @@ export default {
                 }
             });
             this.keyToken = res.data;
-            this.game = new Game(document.getElementById('play_'+this.id));
-            setTimeout(()=>{
-                document.getElementById('play_'+this.id).appendChild(this.game.app.view);
-                this.game.play();
-                console.log("done")
-            }, 500);
+            this.game = new Game(document.getElementById('play_' + this.id));
+            const connected = await this.game.connect();
+            console.log(connected);
+            document.getElementById('play_' + this.id).innerText = "";
+            document.getElementById('play_' + this.id).appendChild(this.game.app.view);
+            this.game.play();
+            console.log("done")
         }
     },
     methods: {
@@ -67,8 +79,68 @@ export default {
     }
 }
 </script>
-<style scoped>
-.play-canvas{
+<style scoped lang="scss">
+.play-canvas {
     height: 75vh;
+    background-color: black;
+}
+.loader-title{
+    position: absolute;
+    top: 68%;
+    font-weight: bold;
+    font-size: 18px;
+}
+.loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    .outer {
+        margin: auto;
+        border: 16px solid rgba(0, 0, 0, 0);
+        border-top: 16px solid rgb(255, 255, 0);
+        border-bottom: 16px solid rgb(255, 255, 0);
+        border-radius: 50%;
+        border-style: double;
+        width: 150px;
+        height: 150px;
+        animation: spin 5s linear infinite;
+
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .inner {
+        margin: auto;
+        border: 15px solid rgba(0, 0, 0, 0);
+        border-top: 15px solid rgb(0, 255, 255);
+        border-bottom: 15px solid rgb(0, 255, 255);
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin2 1.5s linear infinite;
+
+    }
+
+    @keyframes spin2 {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(-360deg);
+        }
+    }
 }
 </style>

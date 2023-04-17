@@ -12,10 +12,19 @@
                         <v-btn class="nav-link" v-if="!store.sessionKey" to="/login">
                             Login
                         </v-btn>
-                        <label class="nav-link" v-else>
-                            Welcome back, {{ store.loggedInUser.username }}
-                            <span class="blink">_</span>
-                        </label>
+                        <v-menu class="nav-link" v-else>
+                            <template v-slot:activator="{ props }">
+                                <v-btn :ripple="false" class="nav-link" v-bind="props">
+                                    Welcome back, {{ store.loggedInUser.username }}
+                                    <span class="blink">_</span>
+                                </v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item>
+                                    <v-list-item-action @click="logout = true">Logout</v-list-item-action>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
                     </v-col>
                 </v-row>
             </v-container>
@@ -41,6 +50,28 @@
                         <span>Play</span>
                     </h2>
                 </v-container>
+                <v-dialog v-model="logout">
+                    <v-card max-width="400px" class="mx-auto">
+                        <v-card-title>
+                            Hold on!
+                        </v-card-title>
+                        <v-card-text>
+                            Signing off? Commander? Your planets will keeps running while you are away!
+                        </v-card-text>
+                        <v-row class="my-3 mx-0">
+                            <v-col cols="6">
+                                <v-btn color="green" class="d-block w-100" @click="loggingOut">
+                                    Yes
+                                </v-btn>
+                            </v-col>
+                            <v-col cols="6">
+                                <v-btn color="red" class="d-block w-100" @click="logout = false">
+                                    No
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                </v-dialog>
             </v-main>
         </v-img>
     </v-app>
@@ -68,7 +99,8 @@ export default {
             stars: [],
             renderer: null,
             camera: null,
-            cancelAnimate: false
+            cancelAnimate: false,
+            logout: false
         }
     },
     mounted() {
@@ -88,7 +120,7 @@ export default {
             this.render();
         }
     },
-    beforeUnmount(){
+    beforeUnmount() {
         this.cancelAnimate = true;
         this.renderer.dispose();
     },
@@ -100,6 +132,10 @@ export default {
             else {
                 this.$router.push("/game");
             }
+        },
+        loggingOut(){
+            this.store.logout();
+            this.logout = false;
         },
         addSphere() {
             var geometry = new THREE.SphereGeometry(.5, 32, 32)
@@ -139,7 +175,7 @@ export default {
             const scene = toRaw(this.scene);
             const camera = toRaw(this.camera);
             const func = () => {
-                if(this.cancelAnimate){
+                if (this.cancelAnimate) {
                     return;
                 }
                 requestAnimationFrame(func);
@@ -181,6 +217,7 @@ export default {
         letter-spacing: .01px;
         height: auto;
         color: white !important;
+        text-transform: capitalize;
     }
 
     .box {
