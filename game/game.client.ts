@@ -1,9 +1,11 @@
 import { Tick } from "./tick.client";
 import { Application } from "pixi.js";
+import { Connection } from "./connection.client";
 export class Game {
   tick: Tick;
   app: Application;
   parent: HTMLElement;
+  connection: Connection
 
   constructor(parent: HTMLElement) {
     this.parent = parent;
@@ -16,15 +18,22 @@ export class Game {
       resizeTo: parent,
     });
     this.tick = new Tick(this.app);
+    this.connection = new Connection("/test");
   }
   connect() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       //simulate connection
-      setTimeout(() => {
+      try{
+        await this.connection.connect();
         resolve({
-          success: true,
+          success: true
         });
-      }, 500000);
+      }
+      catch{
+        resolve({
+          success: false
+        });
+      }
     });
   }
   play() {

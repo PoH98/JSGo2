@@ -1,14 +1,24 @@
 <template>
     <v-app id="main">
+        <v-navigation-drawer v-model="sidebar">
+            <div class="pa-6">
+                <p class="mb-5">Welcome back, {{ store.loggedInUser.username }}
+                    <span class="blink">_</span>
+                </p>
+                <v-btn color="red" class="d-block w-100" @click="logout = true; sidebar = false;">
+                    Logout
+                </v-btn>
+            </div>
+        </v-navigation-drawer>
         <v-app-bar elevation="0" class="nav">
             <v-container>
                 <v-row>
-                    <v-col cols="6" class="title">
+                    <v-col cols="9" md="4" class="title d-flex align-center">
                         <v-btn class="nav-link" to="/">
                             Galaxy Orbit 4
                         </v-btn>
                     </v-col>
-                    <v-col class="d-flex justify-end">
+                    <v-col class="d-none d-md-flex justify-end">
                         <v-btn class="nav-link" v-if="!store.sessionKey" to="/login">
                             Login
                         </v-btn>
@@ -25,6 +35,13 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
+                    </v-col>
+                    <v-col class="d-md-none" cols="3">
+                        <v-btn class="nav-link" @click="sidebar = !sidebar">
+                            <v-icon>
+                                mdi-menu
+                            </v-icon>
+                        </v-btn>
                     </v-col>
                 </v-row>
             </v-container>
@@ -100,7 +117,8 @@ export default {
             renderer: null,
             camera: null,
             cancelAnimate: false,
-            logout: false
+            logout: false,
+            sidebar: false
         }
     },
     mounted() {
@@ -133,7 +151,7 @@ export default {
                 this.$router.push("/game");
             }
         },
-        loggingOut(){
+        loggingOut() {
             this.store.logout();
             this.logout = false;
         },
@@ -222,6 +240,11 @@ export default {
 
     .box {
         position: relative;
+        @media(max-width: 900px){
+            h1{
+                font-size: 18px;
+            }
+        }
     }
 
     .box__line {

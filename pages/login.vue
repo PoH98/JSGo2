@@ -3,7 +3,7 @@
         <v-app-bar elevation="0" class="nav">
             <v-container>
                 <v-row>
-                    <v-col cols="4" class="title">
+                    <v-col cols="9" md="4" class="title d-flex align-center">
                         <v-btn class="nav-link" to="/">
                             Galaxy Orbit 4
                         </v-btn>
@@ -116,6 +116,7 @@ export default {
         letter-spacing: .01px;
         height: auto;
         color: white !important;
+        text-transform: capitalize;
     }
 
     .bg-img {

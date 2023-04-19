@@ -1,11 +1,11 @@
 <template>
     <div :id="'play_' + id" class="play-canvas position-relative">
-        <BarHUD/>
+        <BarHUD />
         <div class="loader">
             <div class="outer">
                 <div class="inner"></div>
             </div>
-            <p class="text-center loader-title">{{ status }}</p>
+            <p class="text-center px-15 loader-title">{{ status }}</p>
         </div>
     </div>
 </template>
@@ -15,7 +15,7 @@ import moment from 'moment';
 import { useGameStore } from '@/store/gameStore';
 import { Game } from '@/game/game.client';
 export default {
-    components:{
+    components: {
         BarHUD
     },
     props: {
@@ -53,11 +53,15 @@ export default {
             this.keyToken = res.data;
             this.game = new Game(document.getElementById('play_' + this.id));
             const connected = await this.game.connect();
-            console.log(connected);
-            document.getElementById('play_' + this.id).innerText = "";
-            document.getElementById('play_' + this.id).appendChild(this.game.app.view);
-            this.game.play();
-            console.log("done")
+            if (connected.success) {
+                document.getElementById('play_' + this.id).innerText = "";
+                document.getElementById('play_' + this.id).appendChild(this.game.app.view);
+                this.game.play();
+                console.log("done")
+            }
+            else{
+                this.status = "Planet connection failed! System unable to resume communication!"
+            }
         }
     },
     methods: {
@@ -84,12 +88,14 @@ export default {
     height: 75vh;
     background-color: black;
 }
-.loader-title{
+
+.loader-title {
     position: absolute;
     top: 68%;
     font-weight: bold;
     font-size: 18px;
 }
+
 .loader {
     position: absolute;
     inset: 0;
@@ -98,6 +104,7 @@ export default {
     justify-content: center;
     flex-direction: column;
     text-align: center;
+
     .outer {
         margin: auto;
         border: 16px solid rgba(0, 0, 0, 0);
@@ -142,5 +149,4 @@ export default {
             transform: rotate(-360deg);
         }
     }
-}
-</style>
+}</style>

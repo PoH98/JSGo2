@@ -199,7 +199,7 @@
         </svg>
     </div>
 </template>
-<style scoped>
+<style scoped lang="scss">
 .svg-frame {
     position: relative;
     max-width: 455px;
@@ -209,14 +209,24 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
 
-.svg-frame>* {
-    transform: rotate(-0deg) skew(00deg) translateX(calc(0 * var(--i))) translateY(calc(-0px * var(--i)));
-}
+    @media (max-width: 800px) {
+        transform: scale(0.8);
+    }
 
-.svg-frame:hover>* {
-    transform: rotate(-80deg) skew(30deg) translateX(calc(45px * var(--i))) translateY(calc(-35px * var(--i)));
+    @media (max-width: 400px) {
+        transform: scale(0.6);
+    }
+
+    &>* {
+        transform: rotate(-0deg) skew(00deg) translateX(calc(0 * var(--i))) translateY(calc(-0px * var(--i)));
+    }
+
+    @media (min-width: 800px) {
+        &:hover>* {
+            transform: rotate(-80deg) skew(30deg) translateX(calc(45px * var(--i))) translateY(calc(-35px * var(--i)));
+        }
+    }
 }
 
 svg {
