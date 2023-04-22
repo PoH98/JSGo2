@@ -1,6 +1,6 @@
 <template>
     <v-app id="main">
-        <v-navigation-drawer v-model="sidebar">
+        <v-navigation-drawer temporary v-if="store.sessionKey" to="/login" v-model="sidebar">
             <div class="pa-6">
                 <p class="mb-5">Welcome back, {{ store.loggedInUser.username }}
                     <span class="blink">_</span>
@@ -137,6 +137,7 @@ export default {
             this.addSphere();
             this.render();
         }
+        this.sidebar = false;
     },
     beforeUnmount() {
         this.cancelAnimate = true;
